@@ -47,7 +47,7 @@ O grande diferencial do PaperSlide é que a saída é um **PowerPoint nativo e e
 
 ## Como usar
 
-1. Abra o arquivo `paperslide-artifact.html` (ou a versão publicada/hospedada).
+1. Abra o arquivo `paperslide-artifact.html` no link (https://pochmannbr.github.io/paperslide/paperslide-artifact.html).
 2. Carregue um ou mais PDFs de artigos científicos.
 3. Preencha o briefing (evento, público, duração, idioma).
 4. Escolha o modo de trabalho.
