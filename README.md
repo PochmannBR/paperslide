@@ -7,9 +7,12 @@
 ## Autoria
 
 **Pablo Gustavo Cogo Pochmann**
+
 ORCID: [0000-0003-3944-7953](https://orcid.org/0000-0003-3944-7953)
+
 LinkedIn: [linkedin.com/in/pablo-pochmann](https://www.linkedin.com/in/pablo-pochmann/)
-Contato: pochmann.pablo@eb.mil.br
+
+Contato: pablo.pochmann@gmail.com
 
 ---
 
