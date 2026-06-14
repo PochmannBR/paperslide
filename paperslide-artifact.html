@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  PaperSlide — Sua fábrica pessoal de apresentações
+  ----------------------------------------------------------------------------
+  Autor:    Pablo Gustavo Cogo Pochmann
+  ORCID:    https://orcid.org/0000-0003-3944-7953
+  LinkedIn: https://www.linkedin.com/in/pablo-pochmann/
+  Contato:  pochmann.pablo@eb.mil.br
+
+  Copyright (c) 2026 Pablo Gustavo Cogo Pochmann.
+
+  Obra desenvolvida por livre iniciativa pessoal, em horário de folga, sem
+  demanda institucional, com conta pessoal e equipamento particular.
+
+  Licença: Creative Commons Atribuição–NãoComercial 4.0 Internacional
+  (CC BY-NC 4.0) — https://creativecommons.org/licenses/by-nc/4.0/
+  Uso e remix permitidos para fins não comerciais, mantida a atribuição ao
+  autor original. A remoção do crédito de autoria não é autorizada. Para uso
+  comercial, contate o autor.
+  ============================================================================
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaperSlide — De artigo a apresentação</title>
+<meta name="author" content="Pablo Gustavo Cogo Pochmann">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,640;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundle.js"></script>
+<style>
+:root{
+  --ink:#14213D;        /* azul-marinho profundo */
+  --ink-2:#1F3864;      /* navy de apoio */
+  --paper:#FAF8F2;      /* papel quente */
+  --card:#FFFFFF;
+  --gold:#C9A227;       /* dourado institucional */
+  --gold-soft:#F3E9C8;
+  --slate:#5A6378;      /* texto secundário */
+  --line:#E4DFD2;
+  --ok:#2E7D52;
+  --err:#A14034;
+  --r:10px;
+  --shadow:0 1px 2px rgba(20,33,61,.06), 0 8px 24px rgba(20,33,61,.07);
+  --font-d:'Fraunces',serif;
+  --font-b:'Public Sans',system-ui,sans-serif;
+  --font-m:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.55}
+button{font-family:inherit;cursor:pointer}
+textarea,input,select{font-family:inherit;font-size:14px;color:var(--ink)}
+::selection{background:var(--gold-soft)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* ---------- cabeçalho ---------- */
+.topbar{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:20}
+.logo{font-family:var(--font-d);font-weight:700;font-size:21px;letter-spacing:-.01em}
+.logo .dot{color:var(--gold)}
+.tagline{font-family:var(--font-m);font-size:11px;color:var(--slate);letter-spacing:.06em;text-transform:uppercase;border-left:1px solid var(--line);padding-left:12px}
+.tagline .author-link{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--gold)}
+.tagline .author-link:hover{color:var(--gold)}
+.topbar .spacer{flex:1}
+.btn-ghost{background:none;border:1px solid var(--line);border-radius:8px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.btn-ghost:hover{border-color:var(--gold);background:var(--gold-soft)}
+.usagebox{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 14px;margin-right:12px;cursor:default}
+.usagebox .ucol{display:flex;flex-direction:column;align-items:center;line-height:1.1;min-width:46px}
+.usagebox .uval{font-family:var(--font-m);font-weight:600;font-size:14px;color:var(--ink)}
+.usagebox .ulbl{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate);margin-top:2px}
+.usagebox .usep{width:1px;height:24px;background:var(--line)}
+@media(max-width:680px){.usagebox{display:none!important}.tagline{display:none}}
+
+/* ---------- tela de protocolo (setup) ---------- */
+.setup{max-width:880px;margin:0 auto;padding:38px 22px 80px}
+.setup h1{font-family:var(--font-d);font-weight:640;font-size:34px;line-height:1.15;letter-spacing:-.015em;margin-bottom:8px}
+.setup .lead{color:var(--slate);max-width:60ch;margin-bottom:34px}
+.fieldset{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
+.fieldset>.fhead{display:flex;align-items:baseline;gap:10px;padding:15px 20px;border-bottom:1px solid var(--line)}
+.fnum{font-family:var(--font-m);font-size:12px;font-weight:600;color:var(--gold);letter-spacing:.05em}
+.fhead h2{font-family:var(--font-d);font-weight:640;font-size:17px}
+.fhead .hint{margin-left:auto;font-size:12px;color:var(--slate)}
+.fbody{padding:18px 20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+label.fl{display:block;font-size:12px;font-weight:600;color:var(--slate);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.inp{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff}
+.inp:focus{border-color:var(--gold);outline:none}
+textarea.inp{resize:vertical;min-height:74px;line-height:1.5}
+.mono{font-family:var(--font-m);font-size:13px}
+.note{font-size:12.5px;color:var(--slate);margin-top:8px}
+.note a{color:var(--ink-2)}
+
+/* upload */
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:26px;text-align:center;color:var(--slate);transition:.15s;background:#fff}
+.drop.over{border-color:var(--gold);background:var(--gold-soft)}
+.drop strong{color:var(--ink-2)}
+.filelist{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.filechip{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13.5px}
+.filechip .fname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filechip .fsize{font-family:var(--font-m);font-size:11.5px;color:var(--slate);margin-left:auto;flex-shrink:0}
+.filechip .fx{border:none;background:none;color:var(--slate);font-size:16px;line-height:1;padding:2px 4px}
+.filechip .fx:hover{color:var(--err)}
+
+details.promptbox summary{cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink-2);padding:4px 0}
+details.promptbox textarea{margin-top:10px;min-height:220px}
+
+.modepick{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.modepick{grid-template-columns:1fr}}
+.modecard{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:14px 16px;transition:.13s}
+.modecard:hover{border-color:var(--gold)}
+.modecard.sel{border-color:var(--ink-2);background:var(--gold-soft);box-shadow:var(--shadow)}
+.modecard .mt{font-family:var(--font-d);font-weight:640;font-size:16px;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.modecard .md{font-size:13px;color:var(--slate);line-height:1.45}
+.mbadge{font-family:var(--font-b);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ok);background:#E6F2EB;border-radius:5px;padding:2px 7px}
+
+.cta-row{display:flex;align-items:center;gap:14px;margin-top:26px}
+.btn-primary{background:var(--ink);color:#fff;border:none;border-radius:9px;padding:13px 26px;font-size:15px;font-weight:700;letter-spacing:.01em;box-shadow:var(--shadow)}
+.btn-primary:hover{background:var(--ink-2)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.cta-row .warn{font-size:13px;color:var(--err);display:none}
+.credit{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--slate);line-height:1.5}
+.credit a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--gold)}
+.credit a:hover{color:var(--gold)}
+
+/* ---------- área de trabalho ---------- */
+.workspace{display:none;height:calc(100vh - 57px)}
+.workspace.active{display:grid;grid-template-columns:230px 1fr}
+@media(max-width:760px){.workspace.active{grid-template-columns:1fr}.rail{display:none!important}}
+
+/* trilho de fases — assinatura visual */
+.rail{border-right:1px solid var(--line);padding:26px 0 26px 22px;display:flex;flex-direction:column;gap:0;background:var(--paper)}
+.rail .rtitle{font-family:var(--font-m);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:18px}
+.phase{display:flex;gap:12px;position:relative;padding-bottom:30px}
+.phase:last-child{padding-bottom:0}
+.phase::before{content:'';position:absolute;left:13px;top:30px;bottom:2px;width:1.5px;background:var(--line)}
+.phase:last-child::before{display:none}
+.phase .pn{width:27px;height:27px;border-radius:50%;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-m);font-size:11.5px;font-weight:600;color:var(--slate);flex-shrink:0;z-index:1;transition:.2s}
+.phase .pl{font-size:13px;font-weight:600;color:var(--slate);padding-top:4px;transition:.2s}
+.phase.cur .pn{border-color:var(--gold);background:var(--gold);color:var(--ink);box-shadow:0 0 0 4px var(--gold-soft)}
+.phase.cur .pl{color:var(--ink)}
+.phase.done .pn{border-color:var(--ink-2);background:var(--ink-2);color:#fff}
+.phase.done .pl{color:var(--ink-2)}
+.phase.done::before{background:var(--ink-2)}
+
+/* conversa */
+.chatcol{display:flex;flex-direction:column;min-width:0}
+.chat{flex:1;overflow-y:auto;padding:28px 26px;display:flex;flex-direction:column;gap:18px}
+.msg{max-width:760px}
+.msg .who{font-family:var(--font-m);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);margin-bottom:6px}
+.msg.user{align-self:flex-end;text-align:right}
+.msg.user .bubble{background:var(--ink);color:#fff;border-radius:14px 14px 4px 14px;padding:11px 16px;display:inline-block;text-align:left;max-width:560px}
+.msg.ai .bubble{background:var(--card);border:1px solid var(--line);border-radius:4px 14px 14px 14px;padding:16px 20px;box-shadow:var(--shadow)}
+.bubble p{margin:0 0 10px}.bubble p:last-child{margin:0}
+.bubble h3{font-family:var(--font-d);font-size:16.5px;font-weight:640;margin:14px 0 8px;color:var(--ink-2)}
+.bubble h3:first-child{margin-top:0}
+.bubble ul,.bubble ol{margin:0 0 10px 20px}
+.bubble li{margin-bottom:4px}
+.bubble strong{color:var(--ink-2)}
+.bubble code{font-family:var(--font-m);font-size:12.5px;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.hexchip{display:inline-flex;align-items:center;gap:6px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:2px 7px 2px 4px;font-family:var(--font-m);font-size:12.5px;vertical-align:middle;white-space:nowrap}
+.hexchip .sw{width:15px;height:15px;border-radius:4px;border:1px solid rgba(0,0,0,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);flex-shrink:0}
+
+/* cartões de opção — estilo alternativas de prova */
+.options{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.options .oq{font-weight:700;font-size:14.5px;color:var(--ink-2);margin-bottom:2px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;transition:.13s;width:100%}
+.opt:hover:not(:disabled){border-color:var(--gold);background:var(--gold-soft);transform:translateX(3px)}
+.opt:disabled{opacity:.55;cursor:default}
+.opt.chosen{border-color:var(--ink-2);background:var(--ink-2);color:#fff}
+.opt.chosen .od{color:#E8E4D8}
+.opt .ol{font-family:var(--font-m);font-weight:600;font-size:12.5px;color:var(--gold);border:1.5px solid currentColor;border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.opt .ot{font-weight:600;font-size:14px}
+.opt .od{font-size:13px;color:var(--slate);margin-top:2px}
+
+/* cartão de entrega pptx */
+.deckcard{margin-top:14px;border:1.5px solid var(--gold);border-radius:var(--r);background:linear-gradient(135deg,#fff, var(--gold-soft));padding:18px 20px}
+.deckcard h4{font-family:var(--font-d);font-size:17px;margin-bottom:4px}
+.deckcard .dmeta{font-size:13px;color:var(--slate);margin-bottom:12px}
+.btn-gold{background:var(--gold);color:var(--ink);border:none;border-radius:8px;padding:11px 20px;font-weight:700;font-size:14px}
+.btn-gold:hover{filter:brightness(1.06)}
+.deckcard .dlerr{margin-top:10px;color:var(--err);font-size:13px;font-weight:600}
+.btn-newpres{display:block;width:100%;margin-top:14px;background:none;border:1.5px solid var(--ink-2);color:var(--ink-2);border-radius:8px;padding:11px 20px;font-weight:700;font-size:14px}
+.btn-newpres:hover{background:var(--ink-2);color:#fff}
+
+/* digitando / erro */
+.typing{display:flex;gap:5px;padding:6px 2px}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:tp 1.1s infinite}
+.typing span:nth-child(2){animation-delay:.18s}.typing span:nth-child(3){animation-delay:.36s}
+@keyframes tp{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.errcard{margin-top:10px;border:1px solid var(--err);border-radius:8px;background:#FBEFEC;color:var(--err);padding:12px 14px;font-size:13.5px}
+.errcard button{margin-top:8px;background:var(--err);color:#fff;border:none;border-radius:6px;padding:7px 14px;font-weight:600;font-size:13px}
+
+/* barra de entrada */
+.inputbar{border-top:1px solid var(--line);padding:14px 26px;background:var(--paper)}
+.inputbar .iwrap{max-width:760px;display:flex;gap:10px}
+.inputbar textarea{flex:1;border:1px solid var(--line);border-radius:10px;padding:11px 14px;min-height:48px;max-height:140px;resize:vertical;background:#fff}
+.inputbar button{background:var(--ink);color:#fff;border:none;border-radius:10px;padding:0 22px;font-weight:700}
+.inputbar button:disabled{opacity:.4;cursor:not-allowed}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">Paper<span class="dot">Slide</span></div>
+  <div class="tagline">Sua fábrica pessoal de apresentações — por <a href="https://www.linkedin.com/in/pablo-pochmann/" target="_blank" rel="noopener" class="author-link">Pablo Pochmann</a></div>
+  <div class="spacer"></div>
+  <div class="usagebox" id="usageBox" style="display:none" title="Consumo desta sessão. Não reflete a cota da sua conta Claude — é uma medição local para você calibrar o uso.">
+    <div class="ucol"><span class="uval" id="uCalls">0</span><span class="ulbl">chamadas</span></div>
+    <div class="usep"></div>
+    <div class="ucol"><span class="uval" id="uTokens">0</span><span class="ulbl">tokens sessão</span></div>
+    <div class="usep"></div>
+    <div class="ucol"><span class="uval" id="uPhase">—</span><span class="ulbl" id="uPhaseLbl">fase</span></div>
+  </div>
+  <button class="btn-ghost" id="btnRestart" style="display:none">↺ Recomeçar</button>
+</header>
+
+<!-- ============ TELA 1: PROTOCOLO ============ -->
+<main class="setup" id="setupScreen">
+  <h1>Monte sua apresentação a partir dos artigos.</h1>
+  <p class="lead">Carregue um ou mais PDFs, descreva o contexto da apresentação e conduza o refinamento em cinco fases, com decisões suas em cada etapa. Ao final, baixe o arquivo <strong>.pptx</strong> pronto. Tudo roda com a sua conta Claude — sem chave de API.</p>
+
+  <div class="fieldset">
+    <div class="fhead"><span class="fnum">01</span><h2>Artigos (PDF)</h2><span class="hint">1 ou mais arquivos · até ~25 MB no total</span></div>
+    <div class="fbody">
+      <div class="drop" id="dropZone">
+        Arraste os PDFs aqui ou <strong>clique para selecionar</strong>
+        <input type="file" id="fileInput" accept="application/pdf" multiple style="display:none">
+      </div>
+      <div class="filelist" id="fileList"></div>
+    </div>
+  </div>
+
+  <div class="fieldset">
+    <div class="fhead"><span class="fnum">02</span><h2>Briefing da apresentação</h2></div>
+    <div class="fbody">
+      <div class="grid2">
+        <div>
+          <label class="fl" for="bEvento">Evento / contexto</label>
+          <input class="inp" id="bEvento" placeholder="Ex.: Congresso, aula, defesa, reunião técnica">
+        </div>
+        <div>
+          <label class="fl" for="bPublico">Público-alvo</label>
+          <input class="inp" id="bPublico" placeholder="Ex.: médicos especialistas, oficiais alunos, leigos">
+        </div>
+        <div>
+          <label class="fl" for="bDuracao">Duração prevista</label>
+          <input class="inp" id="bDuracao" placeholder="Ex.: 10 minutos">
+        </div>
+        <div>
+          <label class="fl" for="bIdioma">Idioma dos slides</label>
+          <select class="inp" id="bIdioma">
+            <option selected>Português (Brasil)</option>
+            <option>English</option>
+            <option>Español</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <label class="fl" for="bExtra">Instruções adicionais (opcional)</label>
+        <textarea class="inp" id="bExtra" placeholder="Ênfases, restrições, mensagem-chave, identidade visual desejada..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="fieldset">
+    <div class="fhead"><span class="fnum">03</span><h2>Modo de trabalho</h2></div>
+    <div class="fbody">
+      <div class="modepick">
+        <button class="modecard" data-mode="rapido" type="button">
+          <div class="mt">⚡ Rápido <span class="mbadge">economiza IA</span></div>
+          <div class="md">Uma única etapa: o consultor analisa e gera a apresentação completa de uma vez. Ideal para contas gratuitas — fecha o ciclo com pouquíssimo uso.</div>
+        </button>
+        <button class="modecard sel" data-mode="completo" type="button">
+          <div class="mt">🎯 Completo</div>
+          <div class="md">Consultoria em 5 fases com refinamento e suas escolhas em cada etapa. Mais uso de IA — recomendado para contas pagas.</div>
+        </button>
+      </div>
+      <p class="note" style="margin-top:12px;background:#F4F1E8;border-radius:8px;padding:10px 12px;border:1px solid var(--line)">
+        💡 <strong>Como escolher e evitar interrupções:</strong> o PaperSlide usa a sua própria conta Claude, então o trabalho pode parar se o limite de uso for atingido no meio. Em <strong>conta gratuita</strong>, prefira o modo <strong>Rápido</strong> — conclui o ciclo inteiro em uma única chamada. Em <strong>conta paga</strong>, o modo <strong>Completo</strong> oferece refinamento fase a fase (várias chamadas). Durante o trabalho, o painel no topo mostra quantas chamadas e tokens esta sessão já consumiu, para acompanhar o ritmo.
+      </p>
+    </div>
+  </div>
+
+  <div class="fieldset">
+    <div class="fhead"><span class="fnum">04</span><h2>Prompt de análise</h2><span class="hint">editável — seu método de trabalho</span></div>
+    <div class="fbody">
+      <details class="promptbox">
+        <summary>Ver e editar o prompt do consultor</summary>
+        <textarea class="inp mono" id="sysPrompt"></textarea>
+      </details>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <button class="btn-primary" id="btnStart">Iniciar análise →</button>
+    <span class="warn" id="startWarn"></span>
+  </div>
+
+  <footer class="credit">
+    PaperSlide © 2026 <a href="https://www.linkedin.com/in/pablo-pochmann/" target="_blank" rel="noopener">Pablo Gustavo Cogo Pochmann</a> · Uso e remix permitidos para fins não comerciais, mantendo a atribuição ao autor.
+  </footer>
+</main>
+
+<!-- ============ TELA 2: WORKSPACE ============ -->
+<div class="workspace" id="workspace">
+  <aside class="rail">
+    <div class="rtitle">Protocolo</div>
+    <div class="phase" data-ph="1"><div class="pn">1</div><div class="pl">Briefing</div></div>
+    <div class="phase" data-ph="2"><div class="pn">2</div><div class="pl">Evidências</div></div>
+    <div class="phase" data-ph="3"><div class="pn">3</div><div class="pl">Estrutura</div></div>
+    <div class="phase" data-ph="4"><div class="pn">4</div><div class="pl">Design visual</div></div>
+    <div class="phase" data-ph="5"><div class="pn">5</div><div class="pl">Geração</div></div>
+  </aside>
+  <div class="chatcol">
+    <div class="chat" id="chat"></div>
+    <div class="inputbar">
+      <div class="iwrap">
+        <textarea id="userInput" placeholder="Responda livremente ou escolha uma opção acima..." rows="1"></textarea>
+        <button id="btnSend">Enviar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= PROMPT PADRÃO (editável na tela) ================= */
+const DEFAULT_PROMPT = `Você é um consultor sênior de comunicação científica. Sua missão é transformar o(s) artigo(s) em PDF anexado(s) em uma apresentação de slides de alto impacto, conduzindo o autor por um processo de consultoria em 5 FASES. Trabalhe sempre no idioma indicado no briefing.
+
+REGRAS DO PROCESSO
+1. Conduza UMA fase por vez. Nunca pule fases nem avance sem a decisão do usuário.
+2. Ao iniciar cada fase, emita o marcador [[FASE:n]] (n = 1 a 5) na primeira linha da resposta.
+3. Toda resposta das fases 1 a 4 DEVE terminar com um bloco de opções de múltipla escolha neste formato exato (JSON válido, sem crase):
+[[OPCOES]]
+{"pergunta":"texto da pergunta","opcoes":[{"id":"A","rotulo":"título curto","descricao":"explicação em 1 frase"},{"id":"B","rotulo":"...","descricao":"..."}]}
+[[/OPCOES]]
+Ofereça de 2 a 4 opções com recomendação explícita (indique qual você recomenda e por quê, no corpo do texto antes do bloco). Mantenha cada "descricao" curta: no máximo 2 frases.
+4. O usuário pode responder clicando numa opção ou escrevendo livremente; acate e prossiga.
+
+AS 5 FASES
+FASE 1 — BRIEFING: confirme seu entendimento do(s) artigo(s) (tema, desenho do estudo, achados centrais) e do contexto (evento, público, duração). Proponha opções de ÂNGULO NARRATIVO da apresentação.
+FASE 2 — EVIDÊNCIAS: liste as evidências-chave extraídas dos PDFs (resultados, números, figuras/tabelas relevantes), com localização (seção/figura/tabela). Proponha opções de quais evidências priorizar.
+FASE 3 — ESTRUTURA: proponha o outline slide a slide (título de cada slide + ideia central), dimensionado para a duração informada (~1 slide/min). Ofereça variações de estrutura.
+FASE 4 — DESIGN VISUAL: proponha direções de identidade visual (paleta em hex, tom tipográfico, uso de destaque) e tratamento dos dados (que vira gráfico, tabela, citação). Ofereça 2-3 direções.
+FASE 5 — GERAÇÃO: faça um QA silencioso (consistência com as fontes, completude das notas, dimensionamento). A geração é feita em DUAS etapas para não exceder o limite de saída:
+
+ETAPA 5A — PLANO: primeiro, emita APENAS o plano do deck (metadados + lista enxuta de slides, sem o conteúdo detalhado). Antes do bloco, escreva 2-3 frases resumindo o deck. Formato (JSON válido, sem texto dentro do bloco):
+[[PLANO]]
+{
+ "meta": {"titulo":"...","subtitulo":"...","autor":"...","evento":"...","data":"...",
+   "tema":{"primaria":"1F3864","acento":"C9A227","fundo":"FFFFFF","texto":"1A1A1A"}},
+ "plano": [
+  {"n":1,"layout":"titulo","titulo":"..."},
+  {"n":2,"layout":"bullets","titulo":"..."}
+ ]
+}
+[[/PLANO]]
+(use os hex de tema decididos na Fase 4, sem #). NÃO gere o conteúdo dos slides nesta etapa.
+
+ETAPA 5B — LOTES: o aplicativo solicitará os slides em lotes, indicando os números (ex.: "Gere os slides 1 a 4"). Para cada lote, emita SOMENTE os objetos completos dos slides pedidos, na ordem, dentro deste bloco (JSON válido = um array, sem texto dentro):
+[[SLIDES]]
+[
+  {"n":1,"layout":"titulo","titulo":"...","subtitulo":"...","notas":"..."}
+]
+[[/SLIDES]]
+Inclua o campo "n" (número do slide) em cada objeto. Gere apenas os slides solicitados no lote atual; não repita os anteriores.
+
+ESTRUTURA DE CADA SLIDE (use o layout mais adequado):
+  {"layout":"titulo","titulo":"...","subtitulo":"...","notas":"..."}
+  {"layout":"secao","numero":"01","titulo":"...","notas":"..."}
+  {"layout":"bullets","titulo":"...","bullets":["..."],"destaque":"frase opcional","citacao":"Autor, ano","notas":"..."}
+  {"layout":"estatistica","titulo":"...","stats":[{"valor":"28%","rotulo":"rótulo curto","desc":"contexto breve"}],"citacao":"...","notas":"..."}
+  {"layout":"cards","titulo":"...","cards":[{"icone":"🔬","titulo":"...","texto":"1-2 frases"}],"citacao":"...","notas":"..."}
+  {"layout":"processo","titulo":"...","passos":[{"n":1,"titulo":"...","texto":"frase curta"}],"citacao":"...","notas":"..."}
+  {"layout":"duascolunas","titulo":"...","esquerda":{"titulo":"...","bullets":["..."]},"direita":{"titulo":"...","bullets":["..."]},"citacao":"...","notas":"..."}
+  {"layout":"tabela","titulo":"...","colunas":["..."],"linhas":[["..."]],"citacao":"...","notas":"..."}
+  {"layout":"destaque","numero":"opcional","texto":"frase de impacto","citacao":"...","notas":"..."}
+  {"layout":"citacao","texto":"...","fonte":"...","notas":"..."}
+  {"layout":"referencias","titulo":"Referências","itens":["..."],"notas":"..."}
+  {"layout":"fechamento","titulo":"...","subtitulo":"...","notas":"..."}
+
+DESIGN VISUAL (importante — evite slides só de texto):
+- PREFIRA layouts visuais aos bullets sempre que o conteúdo permitir. Bullets corridos devem ser exceção, não a regra.
+- Dados numéricos relevantes (percentuais, p-valor, tamanho de efeito, nº de rodadas) → layout "estatistica" ou "destaque", com o número em evidência. Nunca esconda um número de impacto dentro de um bullet.
+- Vantagens, limitações, pilares, cuidados, erros comuns, características → layout "cards" (use um emoji simples e temático no campo "icone").
+- Etapas, fluxos, passos sequenciais → layout "processo".
+- Comparações lado a lado → "duascolunas".
+- Limite cada slide a no máximo ~5 itens; se houver mais, divida em 2 slides. Mantenha textos curtos (cards: 1-2 frases; processo: 1 frase).
+Regras: notas do orador COMPLETAS em todos os slides (o que falar, em texto corrido, no idioma do briefing); cores do tema sem #.
+
+DISCIPLINA DE FONTES (obrigatória)
+- Use APENAS conteúdo presente nos PDFs anexados. Não invente dados, números ou referências.
+- Toda afirmação factual em slide deve ter citação curta (Autor et al., ano — Fig./Tab. X quando aplicável) no campo "citacao".
+- Se precisar de algo que não está nos PDFs, declare como [SUGESTÃO DO AUTOR] e peça confirmação.`;
+
+/* ================= PROMPT MODO RÁPIDO (1 chamada) ================= */
+const FAST_PROMPT = `Você é um consultor sênior de comunicação científica. Transforme o(s) artigo(s) em PDF anexado(s) em uma apresentação de slides completa, em UMA ÚNICA resposta, no idioma indicado no briefing. Não faça perguntas nem ofereça opções — tome as melhores decisões de ângulo, estrutura e design você mesmo, com base no briefing.
+
+Antes do bloco, escreva 2-3 frases resumindo as decisões que tomou (ângulo narrativo e estrutura). Depois, emita o deck COMPLETO entre os marcadores, como JSON válido único, sem nenhum texto dentro do bloco:
+[[PPTX]]
+{
+ "meta": {"titulo":"...","subtitulo":"...","autor":"...","evento":"...","data":"...",
+   "tema":{"primaria":"1F3864","acento":"C9A227","fundo":"FFFFFF","texto":"1A1A1A"}},
+ "slides": [
+  {"layout":"titulo","titulo":"...","subtitulo":"...","notas":"..."},
+  {"layout":"secao","numero":"01","titulo":"...","notas":"..."},
+  {"layout":"bullets","titulo":"...","bullets":["..."],"destaque":"frase opcional","citacao":"Autor, ano","notas":"..."},
+  {"layout":"estatistica","titulo":"...","stats":[{"valor":"28%","rotulo":"rótulo curto","desc":"contexto"}],"citacao":"...","notas":"..."},
+  {"layout":"cards","titulo":"...","cards":[{"icone":"🔬","titulo":"...","texto":"1-2 frases"}],"citacao":"...","notas":"..."},
+  {"layout":"processo","titulo":"...","passos":[{"n":1,"titulo":"...","texto":"frase curta"}],"citacao":"...","notas":"..."},
+  {"layout":"duascolunas","titulo":"...","esquerda":{"titulo":"...","bullets":["..."]},"direita":{"titulo":"...","bullets":["..."]},"citacao":"...","notas":"..."},
+  {"layout":"tabela","titulo":"...","colunas":["..."],"linhas":[["..."]],"citacao":"...","notas":"..."},
+  {"layout":"destaque","numero":"opcional","texto":"frase de impacto","citacao":"...","notas":"..."},
+  {"layout":"citacao","texto":"...","fonte":"...","notas":"..."},
+  {"layout":"referencias","titulo":"Referências","itens":["..."],"notas":"..."},
+  {"layout":"fechamento","titulo":"...","subtitulo":"...","notas":"..."}
+ ]
+}
+[[/PPTX]]
+Regras: dimensione o número de slides à duração do briefing (~1 slide/min); notas do orador COMPLETAS em todos os slides; cores do tema sem #.
+
+DESIGN VISUAL (importante — evite slides só de texto): PREFIRA layouts visuais aos bullets. Números relevantes (%, p-valor, d de Cohen, nº de rodadas) → "estatistica" ou "destaque", com o número em evidência. Vantagens/limitações/pilares/cuidados/erros → "cards" (com emoji temático em "icone"). Etapas/fluxos → "processo". Comparações → "duascolunas". Máximo ~5 itens por slide; textos curtos (cards 1-2 frases, processo 1 frase).
+
+DISCIPLINA DE FONTES (obrigatória): use APENAS conteúdo dos PDFs; não invente dados nem referências; cite a fonte (Autor, ano — Fig./Tab. X) no campo "citacao" de cada afirmação factual.`;
+
+/* ================= MODELOS POR TAREFA ================= */
+const MODEL_CHAT = 'claude-haiku-4-5-20251001';  // fases de conversa/escolha — econômico
+const MODEL_GEN  = 'claude-sonnet-4-6';          // geração de slides — qualidade
+
+/* ================= ESTADO ================= */
+const S = {
+  files: [],          // {name, size, b64}
+  messages: [],       // histórico para a API
+  phase: 0,
+  busy: false,
+  deckCount: 0,
+  mode: 'completo',   // 'rapido' | 'completo'
+  build: null,        // {meta, plano, slides:{}, batchSize, pendingFrom} durante a montagem em lotes
+  calls: 0,           // nº de chamadas à API nesta sessão
+  tokens: 0           // tokens acumulados (input+output) nesta sessão
+};
+const $ = id => document.getElementById(id);
+
+const PHASE_NAMES = { 0:'—', 1:'Briefing', 2:'Evidências', 3:'Estrutura', 4:'Design', 5:'Geração' };
+function fmtTokens(n){
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'k';
+  return String(n);
+}
+function updateUsage(){
+  const box = $('usageBox'); if (!box) return;
+  box.style.display = 'flex';
+  $('uCalls').textContent = S.calls;
+  $('uTokens').textContent = fmtTokens(S.tokens);
+  if (S.mode === 'rapido'){
+    $('uPhase').textContent = S.deckCount ? '✓' : (S.busy ? '…' : '—');
+    $('uPhaseLbl').textContent = 'geração';
+  } else if (S.build){
+    const have = Object.keys(S.build.slides).length;
+    $('uPhase').textContent = have + '/' + S.build.total;
+    $('uPhaseLbl').textContent = 'slides';
+  } else {
+    $('uPhase').textContent = PHASE_NAMES[S.phase] || '—';
+    $('uPhaseLbl').textContent = 'fase';
+  }
+}
+
+/* ================= SETUP: prompt e modo ================= */
+$('sysPrompt').value = DEFAULT_PROMPT;
+
+// seleção do modo de trabalho
+let promptTouched = false;
+$('sysPrompt').addEventListener('input', () => { promptTouched = true; });
+document.querySelectorAll('.modecard').forEach(card => card.onclick = () => {
+  document.querySelectorAll('.modecard').forEach(c => c.classList.remove('sel'));
+  card.classList.add('sel');
+  S.mode = card.dataset.mode;
+  // se o usuário não editou manualmente, sincroniza o prompt mostrado com o modo
+  if (!promptTouched){
+    $('sysPrompt').value = (S.mode === 'rapido') ? FAST_PROMPT : DEFAULT_PROMPT;
+  }
+  $('btnStart').textContent = (S.mode === 'rapido') ? 'Gerar apresentação →' : 'Iniciar análise →';
+});
+
+/* ================= UPLOAD ================= */
+const drop = $('dropZone'), fileInput = $('fileInput');
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); addFiles(e.dataTransfer.files); });
+fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value=''; });
+
+function addFiles(list){
+  [...list].forEach(f => {
+    if (f.type !== 'application/pdf') { showWarn(`"${f.name}" não é PDF e foi ignorado.`); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      S.files.push({ name: f.name, size: f.size, b64: reader.result.split(',')[1] });
+      renderFiles();
+    };
+    reader.readAsDataURL(f);
+  });
+}
+function renderFiles(){
+  $('fileList').innerHTML = S.files.map((f,i) =>
+    `<div class="filechip">📄 <span class="fname">${esc(f.name)}</span><span class="fsize">${(f.size/1048576).toFixed(1)} MB</span><button class="fx" data-i="${i}" aria-label="Remover">×</button></div>`).join('');
+  $('fileList').querySelectorAll('.fx').forEach(b => b.onclick = () => { S.files.splice(+b.dataset.i,1); renderFiles(); });
+}
+function showWarn(t){ const w=$('startWarn'); w.textContent=t; w.style.display='inline'; setTimeout(()=>w.style.display='none', 6000); }
+
+/* ================= INÍCIO ================= */
+$('btnStart').addEventListener('click', () => {
+  if (!S.files.length) return showWarn('Carregue ao menos um PDF.');
+  const total = S.files.reduce((a,f)=>a+f.size,0);
+  if (total > 28*1048576) return showWarn('Total acima de ~28 MB — remova ou comprima arquivos.');
+
+  $('setupScreen').style.display='none';
+  $('workspace').classList.add('active');
+  $('btnRestart').style.display='inline-block';
+  updateUsage();
+
+  const fast = (S.mode === 'rapido');
+  const briefing =
+`BRIEFING INICIAL
+- Evento/contexto: ${$('bEvento').value || 'não informado'}
+- Público-alvo: ${$('bPublico').value || 'não informado'}
+- Duração prevista: ${$('bDuracao').value || 'não informada'}
+- Idioma dos slides: ${$('bIdioma').value}
+- Instruções adicionais: ${$('bExtra').value || 'nenhuma'}
+- Artigos anexados: ${S.files.map(f=>f.name).join('; ')}
+
+${fast ? 'Gere a apresentação completa agora, em uma única resposta.' : 'Inicie a FASE 1.'}`;
+
+  const content = S.files.map(f => ({
+    type:'document',
+    source:{ type:'base64', media_type:'application/pdf', data:f.b64 }
+  }));
+  content.push({ type:'text', text: briefing });
+
+  if (fast){
+    // usa o prompt de etapa única (a menos que o usuário tenha editado manualmente)
+    if (!promptTouched) $('sysPrompt').value = FAST_PROMPT;
+    setPhase(5);
+    document.querySelectorAll('.phase').forEach(el => { if (+el.dataset.ph < 5) el.classList.add('done'); });
+  }
+
+  addUserBubble(briefing.replace(/\n/g,'<br>'), true);
+  sendToAPI({ role:'user', content }, fast ? MODEL_GEN : MODEL_CHAT);
+});
+
+let restartArmed = false, restartTimer = null;
+$('btnRestart').addEventListener('click', () => {
+  if (restartArmed){ location.reload(); return; }
+  restartArmed = true;
+  const b = $('btnRestart');
+  const orig = b.textContent;
+  b.textContent = '↺ Confirmar?';
+  b.style.borderColor = 'var(--gold)';
+  b.style.background = 'var(--gold-soft)';
+  clearTimeout(restartTimer);
+  restartTimer = setTimeout(() => {
+    restartArmed = false; b.textContent = orig;
+    b.style.borderColor = ''; b.style.background = '';
+  }, 3000);
+});
+
+/* ================= CHAT / API ================= */
+const chat = $('chat');
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function hexChip(hex){
+  const clean = hex.replace('#','');
+  return `<span class="hexchip"><span class="sw" style="background:#${clean}"></span>#${clean.toUpperCase()}</span>`;
+}
+function mdLite(s){
+  let t = esc(s).trim();
+  t = t.replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h3>$1</h3>');
+  t = t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  // hex de cor → quadradinho + código (antes do `code` para não conflitar)
+  t = t.replace(/`?#([0-9A-Fa-f]{6})\b`?/g, (m,h) => hexChip(h));
+  t = t.replace(/`([^`]+)`/g,'<code>$1</code>');
+  // listas
+  t = t.replace(/(^|\n)((?:[-•] .+(?:\n|$))+)/g, (m,p,block) =>
+    p + '<ul>' + block.trim().split('\n').map(l=>'<li>'+l.replace(/^[-•] /,'')+'</li>').join('') + '</ul>');
+  t = t.replace(/(^|\n)((?:\d+\. .+(?:\n|$))+)/g, (m,p,block) =>
+    p + '<ol>' + block.trim().split('\n').map(l=>'<li>'+l.replace(/^\d+\. /,'')+'</li>').join('') + '</ol>');
+  // parágrafos
+  t = t.split(/\n{2,}/).map(b => /^<(h3|ul|ol)/.test(b.trim()) ? b : '<p>'+b.replace(/\n/g,'<br>')+'</p>').join('');
+  return t;
+}
+
+function addUserBubble(html, isBriefing){
+  const d = document.createElement('div');
+  d.className = 'msg user';
+  d.innerHTML = `<div class="who">${isBriefing?'Briefing':'Você'}</div><div class="bubble">${html}</div>`;
+  chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+}
+function addAIBubble(){
+  const d = document.createElement('div');
+  d.className = 'msg ai';
+  d.innerHTML = `<div class="who">PaperSlide · Consultor</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+  return d.querySelector('.bubble');
+}
+
+function setPhase(n){
+  S.phase = n;
+  document.querySelectorAll('.phase').forEach(el => {
+    const p = +el.dataset.ph;
+    el.classList.toggle('cur', p === n);
+    el.classList.toggle('done', p < n);
+  });
+}
+
+async function sendToAPI(userMsg, model){
+  if (S.busy) return;
+  S.busy = true; $('btnSend').disabled = true;
+  S.messages.push(userMsg);
+  const bubble = addAIBubble();
+  const useModel = model || MODEL_CHAT;
+  const useMaxTokens = (useModel === MODEL_GEN) ? 16000 : 6000;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        model: useModel,
+        max_tokens: useMaxTokens,
+        system: $('sysPrompt').value,
+        messages: S.messages
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error?.message || `Erro HTTP ${res.status}`);
+    S.calls += 1;
+    if (data.usage){
+      S.tokens += (data.usage.input_tokens||0) + (data.usage.output_tokens||0)
+        + (data.usage.cache_read_input_tokens||0) + (data.usage.cache_creation_input_tokens||0);
+    }
+    updateUsage();
+    const full = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+    S.messages.push({ role:'assistant', content: full });
+    renderAssistant(full, bubble);
+    updateUsage();
+  } catch(err){
+    S.messages.pop(); // remove a msg do usuário para permitir reenvio limpo
+    bubble.innerHTML = `<div class="errcard"><strong>Falha na chamada à API.</strong><br>${esc(err.message)}<br><button id="retryBtn">Tentar novamente</button></div>`;
+    bubble.querySelector('#retryBtn').onclick = () => { bubble.closest('.msg').remove(); sendToAPI(userMsg, model); };
+  } finally {
+    S.busy = false; $('btnSend').disabled = false;
+    updateUsage();
+  }
+}
+
+/* ================= RECUPERAÇÃO DE JSON TRUNCADO ================= */
+// Verifica se a string JSON parece terminar bem-formada
+function endsWellFormed(raw){
+  const t = raw.trim();
+  return t.endsWith('}') || t.endsWith(']');
+}
+// Extrai as opções íntegras de um bloco [[OPCOES]] truncado, descartando a última se incompleta
+function salvageOptions(raw){
+  const pergMatch = raw.match(/"pergunta"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+  const pergunta = pergMatch ? pergMatch[1] : '';
+  const opcoes = [];
+  // captura cada objeto de opção completo {...} dentro do array
+  const re = /\{\s*"id"\s*:\s*"([^"]*)"\s*,\s*"rotulo"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"descricao"\s*:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
+  let m;
+  while ((m = re.exec(raw)) !== null){
+    opcoes.push({ id:m[1], rotulo:unesc(m[2]), descricao:unesc(m[3]) });
+  }
+  return opcoes.length ? { pergunta:unesc(pergunta), opcoes } : null;
+}
+function unesc(s){ return String(s).replace(/\\"/g,'"').replace(/\\n/g,' ').replace(/\\\\/g,'\\'); }
+
+/* ================= PARSER DE MARCADORES ================= */
+function renderAssistant(full, bubble){
+  let text = full;
+
+  const ph = text.match(/\[\[FASE:(\d)\]\]/);
+  if (ph) setPhase(+ph[1]);
+  text = text.replace(/\[\[FASE:\d\]\]/g,'');
+
+  let optionsData = null, deckData = null, deckErr = null, optTruncated = false;
+  let planoData = null, slidesData = null, slidesErr = null;
+
+  // Captura [[OPCOES]] mesmo se a tag de fechamento faltar (resposta truncada)
+  const om = text.match(/\[\[OPCOES\]\]([\s\S]*?)(?:\[\[\/OPCOES\]\]|$)/);
+  if (om){
+    const raw = om[1].replace(/```json|```/g,'').trim();
+    const closed = /\[\[\/OPCOES\]\]/.test(om[0]);
+    let parsed = null;
+    try { parsed = JSON.parse(raw); }
+    catch(e){ parsed = salvageOptions(raw); optTruncated = !!parsed; }
+    if (!closed && parsed && !optTruncated){ optTruncated = !endsWellFormed(raw); }
+    optionsData = parsed;
+    text = text.replace(om[0],'');
+  }
+  // ETAPA 5A: plano do deck
+  const pm = text.match(/\[\[PLANO\]\]([\s\S]*?)(?:\[\[\/PLANO\]\]|$)/);
+  if (pm){
+    try { planoData = JSON.parse(pm[1].replace(/```json|```/g,'').trim()); }
+    catch(e){ slidesErr = 'plano: ' + e.message; }
+    text = text.replace(pm[0],'');
+  }
+  // ETAPA 5B: lote de slides
+  const sm = text.match(/\[\[SLIDES\]\]([\s\S]*?)(?:\[\[\/SLIDES\]\]|$)/);
+  if (sm){
+    try { slidesData = JSON.parse(sm[1].replace(/```json|```/g,'').trim()); }
+    catch(e){ slidesErr = 'slides: ' + e.message; }
+    text = text.replace(sm[0],'');
+  }
+  // compatibilidade: bloco [[PPTX]] completo (caso o modelo ainda use)
+  const dm = text.match(/\[\[PPTX\]\]([\s\S]*?)(?:\[\[\/PPTX\]\]|$)/);
+  if (dm){
+    try { deckData = JSON.parse(dm[1].replace(/```json|```/g,'').trim()); }
+    catch(e){ deckErr = e.message; }
+    text = text.replace(dm[0],'');
+  }
+
+  bubble.innerHTML = mdLite(text);
+
+  if (optionsData && Array.isArray(optionsData.opcoes)){
+    const wrap = document.createElement('div');
+    wrap.className = 'options';
+    wrap.innerHTML = (optionsData.pergunta ? `<div class="oq">${esc(optionsData.pergunta)}</div>` : '') +
+      optionsData.opcoes.map(o =>
+        `<button class="opt" data-id="${esc(o.id)}" data-rot="${esc(o.rotulo)}">
+           <span class="ol">${esc(o.id)}</span>
+           <span><span class="ot">${esc(o.rotulo)}</span>${o.descricao?`<div class="od">${esc(o.descricao).replace(/#([0-9A-Fa-f]{6})\b/g,(m,h)=>hexChip(h))}</div>`:''}</span>
+         </button>`).join('');
+    bubble.appendChild(wrap);
+    wrap.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      if (S.busy) return;
+      wrap.querySelectorAll('.opt').forEach(x => { x.disabled = true; });
+      b.classList.add('chosen');
+      const txt = `Opção ${b.dataset.id} — ${b.dataset.rot}`;
+      addUserBubble(esc(txt));
+      sendToAPI({ role:'user', content: txt + '. Prossiga.' });
+    });
+    if (optTruncated){
+      const w = document.createElement('div');
+      w.className = 'errcard';
+      w.innerHTML = `A resposta foi cortada e a última opção pode estar incompleta. Você pode escolher uma das opções acima ou pedir a lista completa.<br><button>Reemitir opções</button>`;
+      w.querySelector('button').onclick = () => {
+        if (S.busy) return;
+        addUserBubble('As opções vieram cortadas. Reemita o bloco [[OPCOES]] completo, de forma concisa.');
+        sendToAPI({ role:'user', content:'O bloco [[OPCOES]] veio truncado. Reemita-o completo e válido, mantendo as descrições curtas (máx. 2 frases por opção) para não exceder o limite.' });
+      };
+      bubble.appendChild(w);
+    }
+  } else if (/\[\[OPCOES\]\]/.test(full)){
+    // havia bloco de opções mas nada pôde ser recuperado
+    const w = document.createElement('div');
+    w.className = 'errcard';
+    w.innerHTML = `Não consegui exibir as opções (resposta cortada antes do conteúdo).<br><button>Reemitir opções</button>`;
+    w.querySelector('button').onclick = () => {
+      if (S.busy) return;
+      addUserBubble('As opções não vieram. Reemita o bloco [[OPCOES]] completo.');
+      sendToAPI({ role:'user', content:'O bloco [[OPCOES]] não veio completo. Reemita-o inteiro e válido, com descrições curtas.' });
+    };
+    bubble.appendChild(w);
+  }
+
+  // ---- ETAPA 5A recebida: inicia montagem em lotes ----
+  if (planoData && Array.isArray(planoData.plano) && planoData.plano.length){
+    setPhase(5);
+    S.build = {
+      meta: planoData.meta || {},
+      plano: planoData.plano,
+      slides: {},                 // n -> objeto do slide
+      batchSize: 4,
+      total: planoData.plano.length
+    };
+    const card = document.createElement('div');
+    card.className = 'deckcard';
+    card.innerHTML = `<h4>📋 Plano aprovado — ${esc(S.build.meta.titulo || 'apresentação')}</h4>
+      <div class="dmeta">${S.build.total} slides planejados · gerando em lotes de ${S.build.batchSize}…</div>
+      <div class="dmeta" id="buildProg">Slide 0 de ${S.build.total}</div>`;
+    bubble.appendChild(card);
+    setTimeout(requestNextBatch, 0);
+  }
+
+  // ---- ETAPA 5B recebida: incorpora lote e pede o próximo ----
+  if (slidesData && S.build){
+    const arr = Array.isArray(slidesData) ? slidesData : (slidesData.slides || [slidesData]);
+    arr.forEach(sl => { if (sl && sl.n != null) S.build.slides[sl.n] = sl; });
+    const have = Object.keys(S.build.slides).length;
+    const prog = document.getElementById('buildProg');
+    if (prog) prog.textContent = `Slide ${have} de ${S.build.total}`;
+    updateUsage();
+    if (have >= S.build.total) finishBuild(bubble);
+    else { setTimeout(requestNextBatch, 0); }
+    chat.scrollTop = chat.scrollHeight;
+    return; // não cair no fluxo de erro abaixo
+  }
+
+  if (deckData){ // compatibilidade com bloco único
+    setPhase(5);
+    document.querySelector('.phase[data-ph="5"]').classList.add('done');
+    showDeckCard(bubble, deckData);
+  } else if (deckErr || slidesErr){
+    const e = document.createElement('div');
+    e.className = 'errcard';
+    e.innerHTML = `Houve um problema ao montar o deck (${esc(deckErr || slidesErr)}).<br><button>Tentar novamente</button>`;
+    e.querySelector('button').onclick = () => {
+      if (S.busy) return;
+      if (S.build) requestNextBatch();
+      else sendToAPI({ role:'user', content:'Reemita o bloco [[PLANO]] completo e válido, sem outro texto.' });
+    };
+    bubble.appendChild(e);
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* ================= ORQUESTRAÇÃO DOS LOTES ================= */
+function requestNextBatch(){
+  const b = S.build; if (!b) return;
+  // descobre os próximos números ainda não gerados
+  const faltam = b.plano.map(p => p.n).filter(n => !(n in b.slides));
+  if (!faltam.length){ return; }
+  const lote = faltam.slice(0, b.batchSize);
+  const ini = lote[0], fim = lote[lote.length-1];
+  const planoTxt = b.plano.filter(p => lote.includes(p.n))
+    .map(p => `slide ${p.n} (${p.layout}): ${p.titulo}`).join('; ');
+  sendToAPI({ role:'user',
+    content:`Gere os slides ${ini} a ${fim} no bloco [[SLIDES]] (array JSON), com conteúdo e notas completos. Plano deste lote: ${planoTxt}. Inclua o campo "n" em cada slide e não repita slides anteriores.` }, MODEL_GEN);
+}
+function finishBuild(bubble){
+  const b = S.build;
+  const ordered = b.plano.map(p => b.slides[p.n]).filter(Boolean);
+  const deck = { meta: b.meta, slides: ordered };
+  document.querySelector('.phase[data-ph="5"]').classList.add('done');
+  showDeckCard(bubble, deck);
+  S.build = null;
+}
+function showDeckCard(bubble, deck){
+  const n = (deck.slides||[]).length;
+  S.deckCount += 1;
+  updateUsage();
+  const card = document.createElement('div');
+  card.className = 'deckcard';
+  card.innerHTML = `<h4>🎉 ${esc(deck.meta?.titulo || 'Apresentação pronta')}</h4>
+    <div class="dmeta">${n} slides · notas do orador incluídas · ${esc(deck.meta?.evento||'')}</div>
+    <button class="btn-gold" id="dlBtn">⬇ Baixar .pptx</button>
+    <div class="dlerr" style="display:none"></div>
+    <button class="btn-newpres" id="newPresBtn">✨ Criar nova apresentação</button>`;
+  const errBox = card.querySelector('.dlerr');
+  card.querySelector('#dlBtn').onclick = async (ev) => {
+    const btn = ev.currentTarget;
+    const orig = btn.textContent;
+    btn.disabled = true; btn.textContent = '⏳ Gerando…';
+    errBox.style.display = 'none';
+    try { await buildPptx(deck); }
+    catch(err){
+      errBox.textContent = '⚠ ' + err.message;
+      errBox.style.display = 'block';
+    }
+    finally { btn.disabled = false; btn.textContent = orig; }
+  };
+  card.querySelector('#newPresBtn').onclick = () => location.reload();
+  bubble.appendChild(card);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* ================= ENTRADA LIVRE ================= */
+$('btnSend').addEventListener('click', sendFree);
+$('userInput').addEventListener('keydown', e => { if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendFree(); } });
+function sendFree(){
+  const t = $('userInput').value.trim();
+  if (!t || S.busy) return;
+  $('userInput').value = '';
+  addUserBubble(esc(t).replace(/\n/g,'<br>'));
+  sendToAPI({ role:'user', content: t });
+}
+
+/* ================= GERADOR PPTX ================= */
+// Garante que a biblioteca esteja carregada antes de gerar (resolve "PptxGenJS is not defined")
+const PPTX_CDNS = [
+  'https://cdnjs.cloudflare.com/ajax/libs/PptxGenJS/3.12.0/pptxgen.bundle.js',
+  'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js',
+  'https://unpkg.com/pptxgenjs@3.12.0/dist/pptxgen.bundle.js'
+];
+function getPptxClass(){
+  return window.PptxGenJS || window.pptxgen || (typeof PptxGenJS !== 'undefined' ? PptxGenJS : null);
+}
+function loadScript(src){
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('falha ao carregar ' + src));
+    document.head.appendChild(s);
+  });
+}
+async function ensurePptx(){
+  if (getPptxClass()) return getPptxClass();
+  for (const url of PPTX_CDNS){
+    try { await loadScript(url); if (getPptxClass()) return getPptxClass(); }
+    catch(e){ /* tenta o próximo CDN */ }
+  }
+  throw new Error('Não foi possível carregar a biblioteca de geração (PptxGenJS). Verifique a conexão e tente novamente.');
+}
+
+async function buildPptx(deck){
+  let Pptx;
+  try { Pptx = await ensurePptx(); }
+  catch(err){ throw new Error(err.message); }
+  const meta = deck.meta || {};
+  const T = Object.assign({ primaria:'1F3864', acento:'C9A227', fundo:'FFFFFF', texto:'1A1A1A' }, meta.tema || {});
+  const p = new Pptx();
+  p.defineLayout({ name:'W169', width:13.333, height:7.5 });
+  p.layout = 'W169';
+  p.title = meta.titulo || 'Apresentação';
+  if (meta.autor) p.author = meta.autor;
+
+  const W = 13.333, H = 7.5;
+  const slides = deck.slides || [];
+
+  function header(s, titulo){
+    // motivo discreto: ponto/quadrado de acento à esquerda do título (não uma linha sob ele)
+    s.addShape('rect', { x:0.6, y:0.56, w:0.14, h:0.5, fill:{ color:T.acento } });
+    s.addText(titulo || '', { x:0.85, y:0.42, w:W-1.45, h:0.95, fontFace:'Georgia', fontSize:26, bold:true, color:T.primaria, valign:'middle' });
+  }
+  function footer(s, sl, idx){
+    if (sl.citacao) s.addText(String(sl.citacao), { x:0.6, y:H-0.46, w:W-2.2, h:0.32, fontSize:9.5, italic:true, color:'9A9A9A' });
+    s.addText(String(idx+1), { x:W-1.0, y:H-0.46, w:0.5, h:0.32, fontSize:9.5, color:'9A9A9A', align:'right' });
+  }
+  // contraste de texto sobre uma cor de fundo (claro/escuro)
+  function readable(hex){
+    const c = (hex||'').replace('#',''); if (c.length<6) return 'FFFFFF';
+    const r=parseInt(c.slice(0,2),16), g=parseInt(c.slice(2,4),16), b=parseInt(c.slice(4,6),16);
+    return (0.299*r+0.587*g+0.114*b) > 150 ? '1A1A1A' : 'FFFFFF';
+  }
+  const bulletOpts = b => (b||[]).map(t => ({ text:String(t), options:{ bullet:{ code:'2022', indent:14 }, fontSize:17, color:T.texto, paraSpaceAfter:10 } }));
+
+  slides.forEach((sl, i) => {
+    const s = p.addSlide();
+    const L = (sl.layout || 'bullets').toLowerCase();
+
+    if (L === 'titulo'){
+      s.background = { color:T.primaria };
+      s.addText(sl.titulo||'', { x:0.9, y:2.2, w:W-1.8, h:1.8, fontFace:'Georgia', fontSize:40, bold:true, color:'FFFFFF', align:'center' });
+      s.addShape('rect', { x:(W/2)-0.5, y:4.05, w:1.0, h:0.06, fill:{ color:T.acento } });
+      if (sl.subtitulo) s.addText(sl.subtitulo, { x:0.9, y:4.35, w:W-1.8, h:0.8, fontSize:19, color:'E8E4D8', align:'center' });
+      const sub = [meta.autor, meta.evento, meta.data].filter(Boolean).join('  ·  ');
+      if (sub) s.addText(sub, { x:0.9, y:5.8, w:W-1.8, h:0.5, fontSize:13, color:'C9C9C9', align:'center' });
+
+    } else if (L === 'secao'){
+      s.background = { color:T.primaria };
+      if (sl.numero) s.addText(String(sl.numero), { x:0.9, y:1.6, w:3, h:2, fontFace:'Georgia', fontSize:80, bold:true, color:T.acento });
+      s.addText(sl.titulo||'', { x:0.95, y:3.6, w:W-2, h:1.5, fontFace:'Georgia', fontSize:32, bold:true, color:'FFFFFF' });
+
+    } else if (L === 'duascolunas'){
+      s.background = { color:T.fundo };
+      header(s, sl.titulo);
+      const colW = (W-1.8)/2;
+      [[sl.esquerda,0.6],[sl.direita,0.6+colW+0.6]].forEach(([c,x])=>{
+        if (!c) return;
+        if (c.titulo) s.addText(c.titulo, { x, y:1.7, w:colW, h:0.5, fontSize:17, bold:true, color:T.acento });
+        s.addText(bulletOpts(c.bullets), { x, y:2.25, w:colW, h:H-3.1, valign:'top' });
+      });
+      footer(s, sl, i);
+
+    } else if (L === 'tabela'){
+      s.background = { color:T.fundo };
+      header(s, sl.titulo);
+      const rows = [
+        (sl.colunas||[]).map(c => ({ text:String(c), options:{ bold:true, color:'FFFFFF', fill:{ color:T.primaria }, fontSize:13 } })),
+        ...(sl.linhas||[]).map(r => r.map(c => ({ text:String(c), options:{ fontSize:13, color:T.texto } })))
+      ];
+      s.addTable(rows, { x:0.6, y:1.7, w:W-1.2, border:{ pt:0.5, color:'D9D4C5' }, autoPage:false, rowH:0.45 });
+      footer(s, sl, i);
+
+    } else if (L === 'citacao'){
+      s.background = { color:T.fundo };
+      s.addText('“', { x:0.7, y:0.7, w:1.5, h:1.5, fontFace:'Georgia', fontSize:110, color:T.acento });
+      s.addText(sl.texto||'', { x:1.4, y:2.2, w:W-2.8, h:2.6, fontFace:'Georgia', fontSize:26, italic:true, color:T.primaria, align:'center' });
+      if (sl.fonte) s.addText('— '+sl.fonte, { x:1.4, y:5.0, w:W-2.8, h:0.5, fontSize:15, color:'8A8A8A', align:'center' });
+
+    } else if (L === 'referencias'){
+      s.background = { color:T.fundo };
+      header(s, sl.titulo || 'Referências');
+      s.addText((sl.itens||[]).map(t=>({ text:String(t), options:{ bullet:{code:'2022',indent:12}, fontSize:12.5, color:T.texto, paraSpaceAfter:8 } })), { x:0.6, y:1.7, w:W-1.2, h:H-2.5, valign:'top' });
+      footer(s, sl, i);
+
+    } else if (L === 'fechamento'){
+      s.background = { color:T.primaria };
+      s.addText(sl.titulo||'Obrigado', { x:0.9, y:2.6, w:W-1.8, h:1.4, fontFace:'Georgia', fontSize:38, bold:true, color:'FFFFFF', align:'center' });
+      s.addShape('rect', { x:(W/2)-0.5, y:4.0, w:1.0, h:0.06, fill:{ color:T.acento } });
+      if (sl.subtitulo) s.addText(sl.subtitulo, { x:0.9, y:4.3, w:W-1.8, h:1.0, fontSize:17, color:'E8E4D8', align:'center' });
+
+    } else if (L === 'estatistica'){
+      // 1 a 4 números grandes em destaque
+      s.background = { color:T.fundo };
+      header(s, sl.titulo);
+      const stats = (sl.stats||[]).slice(0,4);
+      const n = Math.max(stats.length,1);
+      const gap = 0.4, totalW = W-1.2, cardW = (totalW-(n-1)*gap)/n;
+      stats.forEach((st,k)=>{
+        const x = 0.6 + k*(cardW+gap);
+        s.addShape('roundRect', { x, y:2.1, w:cardW, h:3.4, rectRadius:0.1, fill:{ color:'F7F5EF' } });
+        const val = String(st.valor||'');
+        const fs = val.length<=3 ? 54 : (val.length<=5 ? 40 : (val.length<=7 ? 30 : 24));
+        s.addText(val, { x:x+0.1, y:2.5, w:cardW-0.2, h:1.6, fontFace:'Georgia', fontSize:fs, bold:true, color:T.primaria, align:'center', valign:'middle', fit:'shrink' });
+        if (st.rotulo) s.addText(String(st.rotulo), { x:x+0.2, y:4.15, w:cardW-0.4, h:0.6, fontSize:14, bold:true, color:T.acento, align:'center', valign:'middle' });
+        if (st.desc) s.addText(String(st.desc), { x:x+0.2, y:4.75, w:cardW-0.4, h:0.7, fontSize:11, color:T.texto, align:'center', valign:'top' });
+      });
+      footer(s, sl, i);
+
+    } else if (L === 'cards'){
+      // grade de cartões com ícone (emoji) em círculo
+      s.background = { color:T.fundo };
+      header(s, sl.titulo);
+      const cards = (sl.cards||[]).slice(0,6);
+      const cols = cards.length<=2?cards.length:(cards.length<=4?2:3);
+      const rows = Math.ceil(cards.length/cols);
+      const gx=0.35, gy=0.35, x0=0.6, y0=1.75;
+      const cardW=(W-1.2-(cols-1)*gx)/cols, cardH=(H-y0-0.6-(rows-1)*gy)/rows;
+      cards.forEach((c,k)=>{
+        const cx=x0+(k%cols)*(cardW+gx), cy=y0+Math.floor(k/cols)*(cardH+gy);
+        s.addShape('roundRect', { x:cx, y:cy, w:cardW, h:cardH, rectRadius:0.08, fill:{ color:'F7F5EF' } });
+        s.addShape('ellipse', { x:cx+0.25, y:cy+0.25, w:0.55, h:0.55, fill:{ color:T.primaria } });
+        if (c.icone) s.addText(String(c.icone), { x:cx+0.25, y:cy+0.25, w:0.55, h:0.55, fontSize:20, align:'center', valign:'middle' });
+        if (c.titulo) s.addText(String(c.titulo), { x:cx+0.95, y:cy+0.22, w:cardW-1.15, h:0.6, fontSize:14.5, bold:true, color:T.primaria, valign:'middle' });
+        if (c.texto) s.addText(String(c.texto), { x:cx+0.25, y:cy+0.95, w:cardW-0.5, h:cardH-1.1, fontSize:12, color:T.texto, valign:'top' });
+      });
+      footer(s, sl, i);
+
+    } else if (L === 'processo'){
+      // passos numerados em fluxo (até 5 por linha)
+      s.background = { color:T.fundo };
+      header(s, sl.titulo);
+      const steps = (sl.passos||[]).slice(0,10);
+      const perRow = steps.length<=5?steps.length:Math.ceil(steps.length/2);
+      const rows = Math.ceil(steps.length/perRow);
+      const gx=0.3, gy=0.45, x0=0.6, y0=1.85;
+      const stW=(W-1.2-(perRow-1)*gx)/perRow, stH=(H-y0-0.6-(rows-1)*gy)/rows;
+      steps.forEach((st,k)=>{
+        const sx=x0+(k%perRow)*(stW+gx), sy=y0+Math.floor(k/perRow)*(stH+gy);
+        s.addShape('roundRect', { x:sx, y:sy, w:stW, h:stH, rectRadius:0.07, fill:{ color:'F7F5EF' } });
+        s.addShape('ellipse', { x:sx+0.18, y:sy+0.18, w:0.5, h:0.5, fill:{ color:T.acento } });
+        s.addText(String(st.n!=null?st.n:(k+1)), { x:sx+0.18, y:sy+0.18, w:0.5, h:0.5, fontSize:16, bold:true, color:readable(T.acento), align:'center', valign:'middle' });
+        if (st.titulo) s.addText(String(st.titulo), { x:sx+0.18, y:sy+0.78, w:stW-0.36, h:0.55, fontSize:12.5, bold:true, color:T.primaria, valign:'top' });
+        if (st.texto) s.addText(String(st.texto), { x:sx+0.18, y:sy+1.35, w:stW-0.36, h:stH-1.5, fontSize:10.5, color:T.texto, valign:'top' });
+      });
+      footer(s, sl, i);
+
+    } else if (L === 'destaque'){
+      // frase/número único de grande impacto, fundo escuro
+      s.background = { color:T.primaria };
+      if (sl.numero) s.addText(String(sl.numero), { x:0.9, y:1.9, w:W-1.8, h:2.2, fontFace:'Georgia', fontSize:96, bold:true, color:T.acento, align:'center', valign:'middle', fit:'shrink' });
+      s.addText(sl.texto||sl.titulo||'', { x:1.2, y:(sl.numero?4.2:2.8), w:W-2.4, h:2.0, fontFace:'Georgia', fontSize:26, bold:true, color:'FFFFFF', align:'center', valign:'top' });
+      if (sl.citacao) s.addText(String(sl.citacao), { x:1.2, y:6.4, w:W-2.4, h:0.5, fontSize:12, italic:true, color:'B8C0D0', align:'center' });
+
+    } else { /* bullets (padrão) */
+      s.background = { color:T.fundo };
+      header(s, sl.titulo);
+      const hasBox = !!sl.destaque;
+      s.addText(bulletOpts(sl.bullets), { x:0.6, y:1.65, w:W-1.2, h:(hasBox? H-3.7 : H-2.4), valign:'top' });
+      if (hasBox){
+        s.addShape('rect', { x:0.6, y:H-1.85, w:W-1.2, h:1.0, fill:{ color:'F6F1DF' } });
+        s.addShape('rect', { x:0.6, y:H-1.85, w:0.12, h:1.0, fill:{ color:T.acento } });
+        s.addText(sl.destaque, { x:0.9, y:H-1.8, w:W-1.7, h:0.9, fontSize:15, bold:true, italic:true, color:T.primaria, valign:'middle' });
+      }
+      footer(s, sl, i);
+    }
+
+    if (sl.notas) s.addNotes(String(sl.notas));
+  });
+
+  const fname = (meta.titulo || 'apresentacao').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60) + '.pptx';
+  try {
+    // download via blob — mais confiável no sandbox de artefatos que writeFile()
+    const blob = await p.write({ outputType: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = fname;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  } catch(err){
+    // fallback para o método padrão
+    try { await p.writeFile({ fileName: fname }); }
+    catch(e2){ throw new Error('Falha ao gerar o arquivo: ' + (err.message || e2.message)); }
+  }
+}
+</script>
+</body>
+</html>

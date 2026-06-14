@@ -1,0 +1,25 @@
+{
+  "title": "PaperSlide: Sua fábrica pessoal de apresentações",
+  "description": "Aplicação web de arquivo único que transforma artigos científicos em PDF em apresentações de slides (.pptx) totalmente editáveis, por meio de um fluxo de consultoria assistida por IA. Desenvolvida por livre iniciativa pessoal do autor, em horário de folga, sem demanda institucional, com conta pessoal e equipamento particular.",
+  "creators": [
+    {
+      "name": "Pochmann, Pablo Gustavo Cogo",
+      "orcid": "0000-0003-3944-7953"
+    }
+  ],
+  "keywords": [
+    "apresentações",
+    "comunicação científica",
+    "PowerPoint",
+    "PptxGenJS",
+    "inteligência artificial",
+    "Claude",
+    "automação acadêmica",
+    "slides",
+    "PDF"
+  ],
+  "license": "CC-BY-NC-4.0",
+  "upload_type": "software",
+  "language": "por",
+  "access_right": "open"
+}
