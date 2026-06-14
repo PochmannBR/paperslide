@@ -65,9 +65,7 @@ O grande diferencial do PaperSlide é que a saída é um **PowerPoint nativo e e
 
 Se utilizar ou referenciar esta Obra, por favor cite:
 
-> POCHMANN, P. G. C. *PaperSlide: Sua fábrica pessoal de apresentações.* 2026. Software. DOI: [a ser preenchido após o registro no Zenodo].
-
-(O DOI será gerado automaticamente ao publicar uma *release* conectada ao Zenodo. Após o registro, substitua o marcador acima pelo DOI emitido.)
+> POCHMANN, P. G. C. *PaperSlide: Sua fábrica pessoal de apresentações.* 2026. Software. DOI: https://doi.org/10.5281/zenodo.20692365.
 
 ## Licença
 
